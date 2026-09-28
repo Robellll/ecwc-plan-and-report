@@ -152,8 +152,8 @@ export default function HomePage() {
                   {user.role === "superadmin"
                     ? "Super Admin"
                     : user.role === "project_manager"
-                    ? `PM · ${user.project_name || "Corporate"}`
-                    : `${user.department || "Dept"} Manager`}
+                      ? `PM · ${user.project_name || "Corporate"}`
+                      : `${user.department || "Dept"} Manager`}
                 </span>
               </div>
               <button
@@ -192,7 +192,7 @@ export default function HomePage() {
             <span>ECWC · ኢ.ኮ.ሥ.ኮ</span>
           </div>
 
-          <h1>Project Progress Reports</h1>
+          <h1>Project Progress Reports for ECWC</h1>
           <p className="subtitle">
             Ethiopian Construction Works Corporation | Planning &amp; Operational Performance Tracking
           </p>
@@ -250,7 +250,7 @@ export default function HomePage() {
 
             <h1 className="welcome-title">Project Progress Reports</h1>
 
-            
+
             <p className="welcome-amharic">የኢትዮጵያ ኮንስትራክሽን ሥራዎች ኮርፖሬሽን</p>
 
             <div className="welcome-highlights">
