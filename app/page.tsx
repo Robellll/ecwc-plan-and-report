@@ -248,7 +248,7 @@ export default function HomePage() {
               <span>ECWC · ኢ.ኮ.ሥ.ኮ · Enterprise Portal</span>
             </div>
 
-            <h1 className="welcome-title">Project Progress Reports</h1>
+            <h1 className="welcome-title">Project Progress Reports for ECWC</h1>
 
 
             <p className="welcome-amharic">የኢትዮጵያ ኮንስትራክሽን ሥራዎች ኮርፖሬሽን</p>
