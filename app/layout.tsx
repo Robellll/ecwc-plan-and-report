@@ -5,8 +5,13 @@ export const metadata: Metadata = {
   title: "ECWC · Weekly Project Reports",
   description: "Ethiopian Construction Works Corporation (ECWC) — Track weekly project progress, planned vs actual metrics, and department updates.",
   icons: {
-    icon: "/logo.png",
-    apple: "/logo.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png" },
+      { url: "/ecwc-logo.png", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
 };
 
