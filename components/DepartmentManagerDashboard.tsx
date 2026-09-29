@@ -64,17 +64,6 @@ export default function DepartmentManagerDashboard({
             Corporate head office oversight: review all project milestone trajectories, compare previous vs. current progress, and follow up on {deptName} operational execution.
           </p>
         </div>
-
-        <div className="banner-actions">
-          <button
-            type="button"
-            className={`btn ${activeTab === "analysis" ? "btn-secondary" : "btn-primary"} btn-sm`}
-            onClick={() => setActiveTab("analysis")}
-          >
-            <BarChartIcon size={14} />
-            <span>Report Analysis</span>
-          </button>
-        </div>
       </div>
 
       {/* Navigation Pills */}
