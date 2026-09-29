@@ -184,33 +184,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Logged-In Portal Header (Hidden for Project Manager to start directly from Welcome) */}
-      {user && user.role !== "project_manager" && (
-        <header className="app-header app-header-compact">
-          <div className="logo-container" title="Ethiopian Construction Works Corporation (ECWC / ኢ.ኮ.ሥ.ኮ)">
-            <img
-              key={theme}
-              src={theme === "dark" ? "/ecwc-logo-white.png" : "/ecwc-logo.png"}
-              alt="ECWC Logo - Ethiopian Construction Works Corporation"
-              className="ecwc-header-logo"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = "/ecwc-logo.png";
-              }}
-            />
-          </div>
 
-          <div className="badge">
-            <span className="badge-dot" />
-            <span>ECWC · ኢ.ኮ.ሥ.ኮ</span>
-          </div>
-
-          <h1>Project Progress Reports for ECWC</h1>
-          <p className="subtitle">
-            Ethiopian Construction Works Corporation | Planning &amp; Operational Performance Tracking
-          </p>
-          <p className="amharic-sub">የኢትዮጵያ ኮንስትራክሽን ሥራዎች ኮርፖሬሽን</p>
-        </header>
-      )}
 
       {/* Migration Error Banner */}
       {migrateError && (
