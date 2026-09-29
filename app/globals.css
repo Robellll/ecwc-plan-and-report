@@ -144,9 +144,17 @@ body {
 .app-wrapper {
   position: relative;
   z-index: 1;
-  max-width: 920px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 24px 24px 80px;
+  transition: max-width 0.25s ease;
+}
+
+/* Super Admin Widescreen: Expands smoothly across the display for tables and multi-column dashboards */
+.app-wrapper.sa-wide {
+  max-width: 1480px;
+  width: 96%;
+  padding: 24px 20px 80px;
 }
 
 /* ─── Top Navigation Bar ────────────────────────────────────── */
@@ -2539,12 +2547,32 @@ body {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   box-shadow: var(--shadow-card);
+  width: 100%;
+}
+
+.user-table-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.user-table-wrapper::-webkit-scrollbar-track {
+  background: var(--bg-surface);
+}
+
+.user-table-wrapper::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.user-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--superadmin-accent);
 }
 
 .user-table {
   width: 100%;
+  min-width: 980px;
   border-collapse: collapse;
   font-size: 0.88rem;
 }

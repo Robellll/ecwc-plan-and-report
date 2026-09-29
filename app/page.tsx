@@ -126,7 +126,7 @@ export default function HomePage() {
   };
 
   return (
-    <main className="app-wrapper">
+    <main className={`app-wrapper ${user?.role === "superadmin" ? "sa-wide" : ""}`}>
       {/* Top Navigation Bar */}
       <div className="top-nav-bar">
         <div className="top-brand-indicator">
