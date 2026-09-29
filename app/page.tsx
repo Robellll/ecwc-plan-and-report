@@ -133,6 +133,15 @@ export default function HomePage() {
       {/* Top Navigation Bar */}
       <div className="top-nav-bar">
         <div className="top-brand-indicator">
+          <img
+            key={theme}
+            src={theme === "dark" ? "/ecwc-logo-white.png" : "/ecwc-logo.png"}
+            alt="ECWC Logo"
+            className="top-nav-logo"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = "/ecwc-logo.png";
+            }}
+          />
           <span className="badge-dot" />
           <span>ECWC Project Portal · ኢ.ኮ.ሥ.ኮ</span>
         </div>
@@ -175,8 +184,8 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Logged-In Portal Header */}
-      {user && (
+      {/* Logged-In Portal Header (Hidden for Project Manager to start directly from Welcome) */}
+      {user && user.role !== "project_manager" && (
         <header className="app-header app-header-compact">
           <div className="logo-container" title="Ethiopian Construction Works Corporation (ECWC / ኢ.ኮ.ሥ.ኮ)">
             <img

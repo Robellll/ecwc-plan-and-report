@@ -176,11 +176,21 @@ body {
 .top-brand-indicator {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--text-secondary);
   letter-spacing: 0.02em;
+}
+
+.top-nav-logo {
+  height: 26px;
+  width: auto;
+  max-width: 80px;
+  object-fit: contain;
+  display: inline-block;
+  vertical-align: middle;
+  border-radius: 4px;
 }
 
 /* ─── Theme Toggle Button ───────────────────────────────────── */
