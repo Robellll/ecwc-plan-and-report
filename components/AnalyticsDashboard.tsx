@@ -29,6 +29,9 @@ interface Report {
   end_date?: string;
   planned_progress: number;
   actual_progress: number;
+  major_wins?: string[];
+  major_plans?: string[];
+  constraints?: string[];
   created_at: string;
   department_updates: DeptUpdateItem[];
 }

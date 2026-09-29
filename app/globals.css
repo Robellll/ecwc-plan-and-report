@@ -4697,3 +4697,394 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
     margin-top: 8px;
   }
 }
+
+/* ==========================================================================
+   CONSTRAINTS & OPERATIONAL HIGHLIGHTS (MAJOR WINS, PLANS, CONSTRAINTS)
+   ========================================================================== */
+
+.constraints-master-section {
+  margin-top: 24px;
+}
+
+.constraint-section-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+  background: var(--bg-surface-2);
+  padding: 6px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.constraint-nav-pill {
+  flex: 1 1 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.constraint-nav-pill:hover {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+
+.constraint-nav-pill.active {
+  background: var(--bg-card);
+  color: var(--ecwc-green);
+  border-color: var(--ecwc-green);
+  box-shadow: 0 2px 8px rgba(22, 101, 52, 0.12);
+}
+
+.constraint-pill-count {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text-muted);
+}
+
+.constraint-nav-pill.active .constraint-pill-count {
+  background: rgba(22, 101, 52, 0.15);
+  color: var(--ecwc-green);
+}
+
+/* Section Table Cards */
+.constraint-table-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  transition: border-color 0.2s;
+}
+
+.constraint-table-card:hover {
+  border-color: rgba(22, 101, 52, 0.35);
+}
+
+.constraint-table-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.constraint-table-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.constraint-badge-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.constraint-badge-icon.wins {
+  background: rgba(234, 179, 8, 0.14);
+  color: #ca8a04;
+}
+
+.constraint-badge-icon.plans {
+  background: rgba(22, 101, 52, 0.14);
+  color: var(--ecwc-green);
+}
+
+.constraint-badge-icon.constraints {
+  background: rgba(239, 68, 68, 0.14);
+  color: #ef4444;
+}
+
+.constraint-subsection-title {
+  margin: 0;
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.constraint-subsection-desc {
+  display: block;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.constraint-count-pill {
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text-secondary);
+}
+
+/* Data Table in Form */
+.constraint-table-scroll {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-surface-1);
+}
+
+.constraint-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+
+.constraint-data-table th {
+  background: var(--bg-surface-2);
+  padding: 10px 14px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--border);
+}
+
+.constraint-data-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.constraint-data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.td-row-num {
+  text-align: center;
+  font-weight: 700;
+  width: 70px;
+}
+
+.row-num-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 24px;
+  padding: 0 6px;
+  background: rgba(22, 101, 52, 0.1);
+  color: var(--ecwc-green);
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 6px;
+  border: 1px solid rgba(22, 101, 52, 0.2);
+}
+
+.td-row-input {
+  width: auto;
+}
+
+.constraint-row-input {
+  width: 100%;
+  padding: 9px 12px;
+  font-size: 0.86rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.constraint-row-input:focus {
+  border-color: var(--ecwc-green);
+  box-shadow: 0 0 0 2px rgba(22, 101, 52, 0.15);
+}
+
+.td-row-action {
+  text-align: center;
+  width: 70px;
+}
+
+.btn-row-delete {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-row-delete:hover {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.constraint-table-footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 10px;
+}
+
+.add-constraint-row-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px dashed var(--ecwc-green);
+  color: var(--ecwc-green);
+  background: rgba(22, 101, 52, 0.05);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.add-constraint-row-btn:hover {
+  background: rgba(22, 101, 52, 0.12);
+  border-style: solid;
+}
+
+.constraint-table-note {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   REPORT CARD DISPLAY FOR CONSTRAINTS & OPERATIONAL HIGHLIGHTS
+   ========================================================================== */
+
+.report-constraints-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.report-constraint-block {
+  background: var(--bg-surface-1);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  transition: border-color 0.2s;
+}
+
+.report-constraint-block.wins {
+  border-left: 3px solid #eab308;
+}
+
+.report-constraint-block.plans {
+  border-left: 3px solid var(--ecwc-green);
+}
+
+.report-constraint-block.constraints {
+  border-left: 3px solid #ef4444;
+}
+
+.report-constraint-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.report-constraint-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.report-constraint-tag.wins {
+  color: #ca8a04;
+}
+
+.report-constraint-tag.plans {
+  color: var(--ecwc-green);
+}
+
+.report-constraint-tag.constraints {
+  color: #dc2626;
+}
+
+.report-constraint-count {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.report-constraint-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.report-constraint-table td {
+  padding: 5px 6px;
+  vertical-align: top;
+  font-size: 0.82rem;
+  border-top: 1px dashed rgba(0, 0, 0, 0.05);
+}
+
+.report-constraint-table tr:first-child td {
+  border-top: none;
+}
+
+.report-td-num {
+  width: 44px;
+  font-weight: 700;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+.report-td-text {
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.mini-numbered-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.mini-numbered-item {
+  display: flex;
+  align-items: flex-start;
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  line-height: 1.35;
+}
+

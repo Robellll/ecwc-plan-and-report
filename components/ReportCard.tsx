@@ -1,7 +1,17 @@
 "use client";
 
 import ProgressBar from "./ProgressBar";
-import { PaletteIcon, WrenchIcon, TagIcon, CalendarIcon, UserIcon, ClockIcon } from "./Icons";
+import {
+  PaletteIcon,
+  WrenchIcon,
+  TagIcon,
+  CalendarIcon,
+  UserIcon,
+  ClockIcon,
+  TrophyIcon,
+  TargetIcon,
+  AlertTriangleIcon,
+} from "./Icons";
 import { formatDateRange } from "@/lib/dateUtils";
 
 interface DeptUpdateItem {
@@ -10,7 +20,7 @@ interface DeptUpdateItem {
   notes: string;
 }
 
-interface Report {
+export interface Report {
   id: number;
   project_name: string;
   week_no: number;
@@ -25,6 +35,9 @@ interface Report {
   last_week_actual?: number;
   last_week_variance?: number;
   this_week_plan?: number;
+  major_wins?: string[];
+  major_plans?: string[];
+  constraints?: string[];
   author_name?: string;
   author_role?: string;
   created_at: string;
@@ -117,7 +130,83 @@ export default function ReportCard({ report }: { report: Report }) {
         )}
       </div>
 
-      {/* Department Updates Accordion */}
+      {/* Constraints & Operational Highlights Sections */}
+      {((report.major_wins && report.major_wins.length > 0) ||
+        (report.major_plans && report.major_plans.length > 0) ||
+        (report.constraints && report.constraints.length > 0)) && (
+        <div className="report-constraints-container">
+          {/* Major Wins */}
+          {report.major_wins && report.major_wins.length > 0 && (
+            <div className="report-constraint-block wins">
+              <div className="report-constraint-header">
+                <span className="report-constraint-tag wins">
+                  <TrophyIcon size={13} />
+                  <span>Major Wins of Last Week</span>
+                </span>
+                <span className="report-constraint-count">{report.major_wins.length} logged</span>
+              </div>
+              <table className="report-constraint-table">
+                <tbody>
+                  {report.major_wins.map((win, idx) => (
+                    <tr key={`card-win-${idx}`}>
+                      <td className="report-td-num">#{idx + 1}</td>
+                      <td className="report-td-text">{win}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* Major Plans */}
+          {report.major_plans && report.major_plans.length > 0 && (
+            <div className="report-constraint-block plans">
+              <div className="report-constraint-header">
+                <span className="report-constraint-tag plans">
+                  <TargetIcon size={13} />
+                  <span>Major Plans of This Week</span>
+                </span>
+                <span className="report-constraint-count">{report.major_plans.length} planned</span>
+              </div>
+              <table className="report-constraint-table">
+                <tbody>
+                  {report.major_plans.map((plan, idx) => (
+                    <tr key={`card-plan-${idx}`}>
+                      <td className="report-td-num">#{idx + 1}</td>
+                      <td className="report-td-text">{plan}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* Constraints List */}
+          {report.constraints && report.constraints.length > 0 && (
+            <div className="report-constraint-block constraints">
+              <div className="report-constraint-header">
+                <span className="report-constraint-tag constraints">
+                  <AlertTriangleIcon size={13} />
+                  <span>Constraints List</span>
+                </span>
+                <span className="report-constraint-count">{report.constraints.length} reported</span>
+              </div>
+              <table className="report-constraint-table">
+                <tbody>
+                  {report.constraints.map((c, idx) => (
+                    <tr key={`card-c-${idx}`}>
+                      <td className="report-td-num">#{idx + 1}</td>
+                      <td className="report-td-text">{c}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Department Updates Accordion (historical compatibility) */}
       {report.department_updates && report.department_updates.length > 0 && (
         <div className="dept-accordion" role="list">
           {report.department_updates.map((du) => (

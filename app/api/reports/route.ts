@@ -21,6 +21,9 @@ export async function GET() {
         COALESCE(r.this_week_plan, 0) AS this_week_plan,
         COALESCE(r.planned_progress, r.cumulative_planned, 0) AS planned_progress,
         COALESCE(r.actual_progress, r.cumulative_actual, 0) AS actual_progress,
+        COALESCE(r.major_wins, '[]'::jsonb) AS major_wins,
+        COALESCE(r.major_plans, '[]'::jsonb) AS major_plans,
+        COALESCE(r.constraints, '[]'::jsonb) AS constraints,
         r.author_id,
         u.name AS author_name,
         u.role AS author_role,
@@ -76,6 +79,10 @@ export async function POST(request: NextRequest) {
       planned_progress,
       actual_progress,
       department_updates,
+      // New sections
+      major_wins,
+      major_plans,
+      constraints,
     } = body;
 
     if (!project_name?.trim()) {
@@ -101,6 +108,17 @@ export async function POST(request: NextRequest) {
     const twPlan = Number(this_week_plan ?? 0);
     const authorId = user ? user.id : null;
 
+    const sanitizeList = (raw: unknown): string[] => {
+      if (!Array.isArray(raw)) return [];
+      return raw
+        .map((item) => (typeof item === "string" ? item.trim() : String(item ?? "").trim()))
+        .filter((item) => item.length > 0);
+    };
+
+    const winsJson = JSON.stringify(sanitizeList(major_wins));
+    const plansJson = JSON.stringify(sanitizeList(major_plans));
+    const constraintsJson = JSON.stringify(sanitizeList(constraints));
+
     const insertResult = await sql`
       INSERT INTO project_reports (
         project_name,
@@ -116,6 +134,9 @@ export async function POST(request: NextRequest) {
         last_week_actual,
         last_week_variance,
         this_week_plan,
+        major_wins,
+        major_plans,
+        constraints,
         author_id
       )
       VALUES (
@@ -132,6 +153,9 @@ export async function POST(request: NextRequest) {
         ${lwActual},
         ${lwVariance},
         ${twPlan},
+        ${winsJson}::jsonb,
+        ${plansJson}::jsonb,
+        ${constraintsJson}::jsonb,
         ${authorId}
       )
       RETURNING id

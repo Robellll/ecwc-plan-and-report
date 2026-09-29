@@ -59,6 +59,9 @@ export async function GET() {
     await sql`ALTER TABLE project_reports ADD COLUMN IF NOT EXISTS author_id INT REFERENCES users(id) ON DELETE SET NULL`;
     await sql`ALTER TABLE project_reports ADD COLUMN IF NOT EXISTS start_date DATE`;
     await sql`ALTER TABLE project_reports ADD COLUMN IF NOT EXISTS end_date DATE`;
+    await sql`ALTER TABLE project_reports ADD COLUMN IF NOT EXISTS major_wins JSONB DEFAULT '[]'::jsonb`;
+    await sql`ALTER TABLE project_reports ADD COLUMN IF NOT EXISTS major_plans JSONB DEFAULT '[]'::jsonb`;
+    await sql`ALTER TABLE project_reports ADD COLUMN IF NOT EXISTS constraints JSONB DEFAULT '[]'::jsonb`;
 
     // Backfill date ranges for existing reports
     await sql`

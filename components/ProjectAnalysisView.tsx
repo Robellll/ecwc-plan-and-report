@@ -44,6 +44,9 @@ export interface Report {
   last_week_actual?: number;
   last_week_variance?: number;
   this_week_plan?: number;
+  major_wins?: string[];
+  major_plans?: string[];
+  constraints?: string[];
   created_at: string;
   author_name?: string;
   department_updates: DeptUpdateItem[];
@@ -974,9 +977,54 @@ export default function ProjectAnalysisView({
                           </ul>
                         </div>
 
-                        <div className="expanded-block">
-                          <h5>Department Notes ({rep.department_updates?.length || 0})</h5>
-                          {rep.department_updates?.length ? (
+                        {/* Major Wins */}
+                        {rep.major_wins && rep.major_wins.length > 0 && (
+                          <div className="expanded-block">
+                            <h5 style={{ color: "#ca8a04" }}>🏆 Major Wins of Last Week ({rep.major_wins.length})</h5>
+                            <div className="mini-numbered-list">
+                              {rep.major_wins.map((win, idx) => (
+                                <div key={idx} className="mini-numbered-item">
+                                  <span className="row-num-badge" style={{ marginRight: 6 }}>#{idx + 1}</span>
+                                  <span>{win}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Major Plans */}
+                        {rep.major_plans && rep.major_plans.length > 0 && (
+                          <div className="expanded-block">
+                            <h5 style={{ color: "var(--ecwc-green)" }}>🎯 Major Plans of This Week ({rep.major_plans.length})</h5>
+                            <div className="mini-numbered-list">
+                              {rep.major_plans.map((plan, idx) => (
+                                <div key={idx} className="mini-numbered-item">
+                                  <span className="row-num-badge" style={{ marginRight: 6 }}>#{idx + 1}</span>
+                                  <span>{plan}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Constraints List */}
+                        {rep.constraints && rep.constraints.length > 0 && (
+                          <div className="expanded-block">
+                            <h5 style={{ color: "#dc2626" }}>⚠️ Constraints List ({rep.constraints.length})</h5>
+                            <div className="mini-numbered-list">
+                              {rep.constraints.map((c, idx) => (
+                                <div key={idx} className="mini-numbered-item">
+                                  <span className="row-num-badge" style={{ marginRight: 6, background: "rgba(239, 68, 68, 0.12)", color: "#ef4444" }}>#{idx + 1}</span>
+                                  <span>{c}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {rep.department_updates && rep.department_updates.length > 0 && (
+                          <div className="expanded-block">
+                            <h5>Department Notes ({rep.department_updates.length})</h5>
                             <div className="expanded-dept-list">
                               {rep.department_updates.map((du) => (
                                 <div key={du.id || du.department} className="mini-dept-note">
@@ -985,10 +1033,8 @@ export default function ProjectAnalysisView({
                                 </div>
                               ))}
                             </div>
-                          ) : (
-                            <p className="text-muted">No individual department notes logged.</p>
-                          )}
-                        </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}

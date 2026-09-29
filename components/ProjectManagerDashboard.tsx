@@ -33,6 +33,9 @@ interface Report {
   last_week_actual?: number;
   last_week_variance?: number;
   this_week_plan?: number;
+  major_wins?: string[];
+  major_plans?: string[];
+  constraints?: string[];
   created_at: string;
   author_name?: string;
   department_updates: DeptUpdateItem[];
