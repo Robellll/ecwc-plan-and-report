@@ -16,6 +16,7 @@ import {
 } from "./Icons";
 import { SessionUser } from "./AuthModal";
 import { formatDate } from "@/lib/dateUtils";
+import ModernDatePicker from "./ModernDatePicker";
 
 export interface TaskItem {
   id: number;
@@ -282,14 +283,14 @@ export default function TaskManager({ user, availableProjects = [] }: TaskManage
 
             <div className="field">
               <label htmlFor="task-due-date">
-                <CalendarIcon size={12} style={{ display: "inline", verticalAlign: "middle", marginRight: 4 }} />
+                <CalendarIcon size={13} style={{ display: "inline", verticalAlign: "middle", marginRight: 5, color: "var(--ecwc-green)" }} />
                 Target Due Date (Calendar)
               </label>
-              <input
+              <ModernDatePicker
                 id="task-due-date"
-                type="date"
                 value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
+                onChange={(val) => setDueDate(val)}
+                placeholder="Select Target Due Date"
                 required
               />
             </div>

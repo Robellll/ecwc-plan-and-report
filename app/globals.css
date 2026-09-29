@@ -3132,6 +3132,291 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════
+   MODERN THEME CALENDAR & DATE PICKER
+   ═══════════════════════════════════════════════════ */
+
+/* Native Input[type="date"] Theme Styling */
+input[type="date"] {
+  color-scheme: light dark;
+  accent-color: var(--ecwc-green);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+[data-theme="dark"] input[type="date"] {
+  color-scheme: dark;
+}
+
+[data-theme="light"] input[type="date"] {
+  color-scheme: light;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 2px;
+  filter: invert(0.6) sepia(1) saturate(5) hue-rotate(50deg);
+  opacity: 0.85;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  transform: scale(1.15);
+  opacity: 1;
+}
+
+/* Modern DatePicker Container */
+.modern-datepicker-container {
+  position: relative;
+  width: 100%;
+}
+
+.modern-datepicker-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.88rem;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.modern-datepicker-trigger:hover {
+  border-color: var(--border-focus);
+  background: var(--bg-card);
+}
+
+.modern-datepicker-trigger.active {
+  border-color: var(--ecwc-green);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+  background: var(--bg-card);
+}
+
+.datepicker-icon-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ecwc-green);
+  flex-shrink: 0;
+}
+
+.datepicker-display-text {
+  flex: 1;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.datepicker-placeholder {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.datepicker-chevron-indicator {
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.modern-datepicker-trigger.active .datepicker-chevron-indicator {
+  transform: rotate(180deg);
+  color: var(--ecwc-green);
+}
+
+/* Floating Theme Calendar Popover */
+.modern-calendar-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 1050;
+  width: 320px;
+  max-width: 95vw;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.35), var(--shadow-glow);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 16px;
+  user-select: none;
+}
+
+/* Popover Header */
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.calendar-month-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.calendar-month-title .month-name {
+  color: var(--text-primary);
+}
+
+.calendar-month-title .year-name {
+  color: var(--ecwc-green);
+}
+
+.calendar-nav-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.calendar-nav-btn:hover {
+  background: var(--accent-glow);
+  border-color: var(--ecwc-green);
+  color: var(--ecwc-green);
+  transform: scale(1.05);
+}
+
+/* Weekday Row */
+.calendar-weekdays-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
+.calendar-weekday-cell {
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 4px 0;
+  letter-spacing: 0.05em;
+}
+
+/* Days Grid */
+.calendar-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-day-btn {
+  position: relative;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
+}
+
+.calendar-day-btn.out-month {
+  color: var(--text-muted);
+  opacity: 0.45;
+}
+
+.calendar-day-btn:hover {
+  background: var(--accent-glow);
+  color: var(--ecwc-green);
+  border-color: rgba(116, 192, 36, 0.3);
+}
+
+.calendar-day-btn.is-today {
+  border-color: var(--ecwc-green);
+  font-weight: 700;
+}
+
+.calendar-day-btn.is-selected {
+  background: var(--btn-gradient) !important;
+  color: var(--btn-text) !important;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(94, 168, 27, 0.35);
+  border-color: transparent;
+  transform: scale(1.04);
+}
+
+/* Footer Presets */
+.calendar-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  gap: 8px;
+}
+
+.calendar-quick-btn {
+  padding: 5px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.calendar-quick-btn.today {
+  background: var(--accent-glow);
+  border: 1px solid var(--border);
+  color: var(--ecwc-green);
+}
+
+.calendar-quick-btn.today:hover {
+  background: var(--ecwc-green);
+  color: #fff;
+}
+
+.calendar-quick-btn.week {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.calendar-quick-btn.week:hover {
+  border-color: var(--ecwc-green);
+  color: var(--ecwc-green);
+}
+
+.calendar-quick-btn.close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+.calendar-quick-btn.close:hover {
+  color: var(--text-primary);
+}
+
+/* ═══════════════════════════════════════════════════
    PROJECT ANALYSIS & STATUS COMPARATOR VIEW
    ═══════════════════════════════════════════════════ */
 

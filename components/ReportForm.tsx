@@ -16,6 +16,7 @@ import {
   CalendarIcon,
 } from "./Icons";
 import { getDefaultDateRange } from "@/lib/dateUtils";
+import ModernDatePicker from "./ModernDatePicker";
 
 interface ReportFormProps {
   onSuccess: () => void;
@@ -153,29 +154,32 @@ export default function ReportForm({ onSuccess, defaultProjectName }: ReportForm
               </div>
             )}
             <div className="field">
-              <label>Reporting Period Calendar (From – To)</label>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              <label>
+                <CalendarIcon size={14} style={{ display: "inline", verticalAlign: "middle", marginRight: 5, color: "var(--ecwc-green)" }} />
+                Reporting Period Calendar (From – To)
+              </label>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
-                  <label htmlFor="period-start" style={{ fontSize: "0.72rem", opacity: 0.8, marginBottom: 4, display: "block" }}>
+                  <label htmlFor="period-start" style={{ fontSize: "0.74rem", fontWeight: 600, color: "var(--text-secondary)", marginBottom: 4, display: "block" }}>
                     From Date
                   </label>
-                  <input
+                  <ModernDatePicker
                     id="period-start"
-                    type="date"
                     value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
+                    onChange={(val) => setStartDate(val)}
+                    placeholder="From Date"
                     required
                   />
                 </div>
                 <div>
-                  <label htmlFor="period-end" style={{ fontSize: "0.72rem", opacity: 0.8, marginBottom: 4, display: "block" }}>
+                  <label htmlFor="period-end" style={{ fontSize: "0.74rem", fontWeight: 600, color: "var(--text-secondary)", marginBottom: 4, display: "block" }}>
                     To Date
                   </label>
-                  <input
+                  <ModernDatePicker
                     id="period-end"
-                    type="date"
                     value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
+                    onChange={(val) => setEndDate(val)}
+                    placeholder="To Date"
                     required
                   />
                 </div>
