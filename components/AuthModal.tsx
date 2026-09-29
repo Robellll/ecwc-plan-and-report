@@ -284,7 +284,7 @@ export default function AuthModal({ onSuccess, defaultMode = "signin" }: AuthMod
                   </div>
 
                   <div className="auth-field auth-phone-field animate-fade-in">
-                    <label htmlFor="auth-phone">Phone Number (For Department Follow-up)</label>
+                    <label htmlFor="auth-phone">Phone Number</label>
                     <div className="auth-input-wrapper">
                       <span className="auth-input-icon">
                         <PhoneIcon size={16} />
@@ -297,9 +297,6 @@ export default function AuthModal({ onSuccess, defaultMode = "signin" }: AuthMod
                         onChange={(e) => setPhone(e.target.value)}
                       />
                     </div>
-                    <span style={{ fontSize: "0.74rem", color: "var(--text-muted)", marginTop: 2 }}>
-                      Allows head office Department Managers to contact you directly regarding operational tasks.
-                    </span>
                   </div>
                 </>
               )}
