@@ -17,6 +17,7 @@ import {
   TrophyIcon,
   TargetIcon,
   AlertTriangleIcon,
+  XCloseIcon,
 } from "./Icons";
 import { getDefaultDateRange } from "@/lib/dateUtils";
 import ModernDatePicker from "./ModernDatePicker";
@@ -51,6 +52,9 @@ export default function ReportForm({ onSuccess, defaultProjectName }: ReportForm
   // Active section tab: "wins" | "plans" | "constraints"
   const [activeConstraintTab, setActiveConstraintTab] = useState<"wins" | "plans" | "constraints">("wins");
   const [viewAllSections, setViewAllSections] = useState<boolean>(false);
+
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [unfilledSections, setUnfilledSections] = useState<{ id: "wins" | "plans" | "constraints"; name: string }[]>([]);
 
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
@@ -114,17 +118,19 @@ export default function ReportForm({ onSuccess, defaultProjectName }: ReportForm
     else setConstraints(remover);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const formatUnfilledQuestion = (sections: { id: "wins" | "plans" | "constraints"; name: string }[]) => {
+    const names = sections.map((s) => `"${s.name}"`);
+    if (names.length === 1) {
+      return `Are you sure you don't have ${names[0]} section?`;
+    }
+    if (names.length === 2) {
+      return `Are you sure you don't have ${names[0]} and ${names[1]} sections?`;
+    }
+    return `Are you sure you don't have ${names[0]}, ${names[1]}, and ${names[2]} sections?`;
+  };
+
+  const executePublish = async (cleanWins: string[], cleanPlans: string[], cleanConstraints: string[]) => {
     const resolvedProject = (defaultProjectName || projectName).trim();
-    if (!resolvedProject) return showToast("error", "Project name is required.");
-    if (!startDate || !endDate) return showToast("error", "Please select both start and end calendar dates.");
-    if (startDate > endDate) return showToast("error", "Period start date cannot be later than end date.");
-
-    const cleanWins = majorWins.map((s) => s.trim()).filter(Boolean);
-    const cleanPlans = majorPlans.map((s) => s.trim()).filter(Boolean);
-    const cleanConstraints = constraints.map((s) => s.trim()).filter(Boolean);
-
     setLoading(true);
     try {
       const res = await fetch("/api/reports", {
@@ -154,6 +160,8 @@ export default function ReportForm({ onSuccess, defaultProjectName }: ReportForm
       if (!res.ok || !data.success) throw new Error(data.error || "Failed to submit report");
 
       showToast("success", "Progress Report & Constraints successfully published!");
+      setShowConfirmModal(false);
+      setUnfilledSections([]);
       setProjectName("");
       const refreshedDates = getDefaultDateRange();
       setStartDate(refreshedDates.startDate);
@@ -171,6 +179,58 @@ export default function ReportForm({ onSuccess, defaultProjectName }: ReportForm
       showToast("error", `Failed to save: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const resolvedProject = (defaultProjectName || projectName).trim();
+    if (!resolvedProject) return showToast("error", "Project name is required.");
+    if (!startDate || !endDate) return showToast("error", "Please select both start and end calendar dates.");
+    if (startDate > endDate) return showToast("error", "Period start date cannot be later than end date.");
+
+    const cleanWins = majorWins.map((s) => s.trim()).filter(Boolean);
+    const cleanPlans = majorPlans.map((s) => s.trim()).filter(Boolean);
+    const cleanConstraints = constraints.map((s) => s.trim()).filter(Boolean);
+
+    const unfilled: { id: "wins" | "plans" | "constraints"; name: string }[] = [];
+    if (cleanWins.length === 0) {
+      unfilled.push({ id: "wins", name: "Major Wins of Last Week" });
+    }
+    if (cleanPlans.length === 0) {
+      unfilled.push({ id: "plans", name: "Major Plans of This Week" });
+    }
+    if (cleanConstraints.length === 0) {
+      unfilled.push({ id: "constraints", name: "Constraints List" });
+    }
+
+    if (unfilled.length > 0) {
+      setUnfilledSections(unfilled);
+      setShowConfirmModal(true);
+      return;
+    }
+
+    // All sections are filled
+    executePublish(cleanWins, cleanPlans, cleanConstraints);
+  };
+
+  const handleConfirmAndPublish = () => {
+    const cleanWins = majorWins.map((s) => s.trim()).filter(Boolean);
+    const cleanPlans = majorPlans.map((s) => s.trim()).filter(Boolean);
+    const cleanConstraints = constraints.map((s) => s.trim()).filter(Boolean);
+    executePublish(cleanWins, cleanPlans, cleanConstraints);
+  };
+
+  const handleCancelAndGoBack = () => {
+    setShowConfirmModal(false);
+    if (unfilledSections.length > 0) {
+      setActiveConstraintTab(unfilledSections[0].id);
+      setTimeout(() => {
+        const el = document.querySelector(".constraints-master-section");
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 100);
     }
   };
 
@@ -723,6 +783,188 @@ export default function ReportForm({ onSuccess, defaultProjectName }: ReportForm
           </div>
         </div>
       </form>
+
+      {/* Unfilled Operational Sections Confirmation Modal */}
+      {showConfirmModal && (
+        <div
+          className="admin-modal-overlay animate-fade-in"
+          style={{ zIndex: 1250 }}
+          onClick={() => !loading && setShowConfirmModal(false)}
+        >
+          <div
+            className="admin-modal-card"
+            style={{ maxWidth: 540, border: "1px solid rgba(245, 158, 11, 0.4)", boxShadow: "0 24px 48px -12px rgba(0, 0, 0, 0.5)" }}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="confirm-unfilled-title"
+          >
+            <div
+              className="admin-modal-header"
+              style={{
+                background: "rgba(245, 158, 11, 0.08)",
+                borderBottomColor: "rgba(245, 158, 11, 0.25)",
+              }}
+            >
+              <h3
+                id="confirm-unfilled-title"
+                className="admin-modal-title"
+                style={{ color: "#f59e0b", display: "flex", alignItems: "center", gap: 10, fontSize: "1.05rem" }}
+              >
+                <AlertTriangleIcon size={20} />
+                <span>Notice: Unfilled Section Detected</span>
+              </h3>
+              <button
+                type="button"
+                className="admin-modal-close-btn"
+                onClick={() => !loading && setShowConfirmModal(false)}
+                disabled={loading}
+                aria-label="Close dialog"
+              >
+                <XCloseIcon size={18} />
+              </button>
+            </div>
+
+            <div className="admin-modal-body" style={{ padding: "24px 24px 20px", display: "flex", flexDirection: "column", gap: "16px" }}>
+              <div
+                style={{
+                  padding: "16px 18px",
+                  background: "rgba(245, 158, 11, 0.08)",
+                  border: "1px solid rgba(245, 158, 11, 0.25)",
+                  borderRadius: "12px",
+                  display: "flex",
+                  gap: "14px",
+                  alignItems: "flex-start",
+                }}
+              >
+                <div
+                  style={{
+                    width: "36px",
+                    height: "36px",
+                    borderRadius: "50%",
+                    background: "rgba(245, 158, 11, 0.18)",
+                    color: "#f59e0b",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                    marginTop: "2px",
+                  }}
+                >
+                  <AlertTriangleIcon size={20} />
+                </div>
+                <div>
+                  <div
+                    id="confirm-unfilled-question"
+                    style={{
+                      fontSize: "1.02rem",
+                      fontWeight: 700,
+                      color: "var(--text-primary)",
+                      lineHeight: 1.45,
+                      marginBottom: "6px",
+                    }}
+                  >
+                    {formatUnfilledQuestion(unfilledSections)}
+                  </div>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: "0.84rem",
+                      color: "var(--text-secondary)",
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    You have not recorded any items under the section{unfilledSections.length > 1 ? "s" : ""} highlighted below.
+                  </p>
+                </div>
+              </div>
+
+              {/* Unfilled Section Badges */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <span
+                  style={{
+                    fontSize: "0.76rem",
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.06em",
+                    color: "var(--text-muted)",
+                  }}
+                >
+                  Unfilled Section{unfilledSections.length > 1 ? "s" : ""}:
+                </span>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                  {unfilledSections.map((sec) => (
+                    <span
+                      key={sec.id}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        padding: "6px 12px",
+                        borderRadius: "20px",
+                        fontSize: "0.82rem",
+                        fontWeight: 600,
+                        background: "rgba(239, 68, 68, 0.12)",
+                        color: "#ef4444",
+                        border: "1px solid rgba(239, 68, 68, 0.25)",
+                      }}
+                    >
+                      <AlertCircleIcon size={14} />
+                      {sec.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <p style={{ fontSize: "0.82rem", color: "var(--text-muted)", margin: 0, lineHeight: 1.45 }}>
+                Click <strong>Go Back &amp; Fill In</strong> to add your entries, or click <strong>Yes, Confirm &amp; Publish</strong> to publish the progress report now without them.
+              </p>
+            </div>
+
+            <div
+              className="admin-modal-footer"
+              style={{
+                padding: "16px 24px",
+                background: "var(--bg-surface)",
+                borderTop: "1px solid var(--border)",
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "12px",
+              }}
+            >
+              <button
+                type="button"
+                id="unfilled-confirm-cancel-btn"
+                className="btn btn-secondary"
+                onClick={handleCancelAndGoBack}
+                disabled={loading}
+                style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
+              >
+                <span>Go Back &amp; Fill In</span>
+              </button>
+              <button
+                type="button"
+                id="unfilled-confirm-publish-btn"
+                className="btn btn-primary"
+                onClick={handleConfirmAndPublish}
+                disabled={loading}
+                style={{
+                  background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+                  borderColor: "#d97706",
+                  color: "#ffffff",
+                  fontWeight: 600,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                }}
+              >
+                {loading ? <span className="spinner" /> : <SaveIcon size={16} />}
+                <span>{loading ? "Publishing…" : "Yes, Confirm & Publish"}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Toast Notification */}
       {toast && (
