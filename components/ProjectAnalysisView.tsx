@@ -54,7 +54,7 @@ export interface Report {
 
 interface ProjectAnalysisViewProps {
   reports: Report[];
-  user: SessionUser;
+  user?: SessionUser | null;
   onNavigateToCreateReport?: () => void;
 }
 
@@ -65,11 +65,11 @@ export default function ProjectAnalysisView({
 }: ProjectAnalysisViewProps) {
   // If user has a default project name, check if reports exist for it
   const defaultProject = useMemo(() => {
-    if (user.project_name && reports.some((r) => r.project_name?.trim() === user.project_name?.trim())) {
+    if (user?.project_name && reports.some((r) => r.project_name?.trim() === user.project_name?.trim())) {
       return user.project_name.trim();
     }
     return null;
-  }, [user.project_name, reports]);
+  }, [user?.project_name, reports]);
 
   const [selectedProject, setSelectedProject] = useState<string | null>(defaultProject);
   const [searchQuery, setSearchQuery] = useState("");
@@ -340,7 +340,7 @@ export default function ProjectAnalysisView({
         ) : (
           <div className="analysis-projects-grid">
             {filteredProjects.map((p) => {
-              const isUserProject = user.project_name && p.projectName.toLowerCase() === user.project_name.toLowerCase();
+              const isUserProject = Boolean(user?.project_name && p.projectName.toLowerCase() === user.project_name.toLowerCase());
               const dateLabel = formatDateRange(
                 p.latestReport.start_date,
                 p.latestReport.end_date,
@@ -810,7 +810,7 @@ export default function ProjectAnalysisView({
             <div className="dept-comparison-grid">
               {departmentComparison.map((deptItem) => {
                 const isUserDept = Boolean(
-                  user.department &&
+                  user?.department &&
                   deptItem.department.trim().toLowerCase() === user.department.trim().toLowerCase()
                 );
 

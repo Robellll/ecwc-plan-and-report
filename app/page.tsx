@@ -1,11 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import ProjectManagerDashboard from "@/components/ProjectManagerDashboard";
 import DepartmentManagerDashboard from "@/components/DepartmentManagerDashboard";
 import SuperAdminDashboard from "@/components/SuperAdminDashboard";
 import AuthModal, { SessionUser } from "@/components/AuthModal";
 import ThemeToggle from "@/components/ThemeToggle";
+import ProjectAnalysisView from "@/components/ProjectAnalysisView";
+import ReportCard from "@/components/ReportCard";
 import {
   AlertTriangleIcon,
   LogOutIcon,
@@ -15,6 +17,11 @@ import {
   ActivityIcon,
   CheckSquareIcon,
   ShieldIcon,
+  BarChartIcon,
+  ClipboardListIcon,
+  FilterIcon,
+  InboxIcon,
+  FolderIcon,
 } from "@/components/Icons";
 
 interface DeptUpdateItem {
@@ -54,6 +61,25 @@ export default function HomePage() {
   const [loadingReports, setLoadingReports] = useState(true);
   const [migrateError, setMigrateError] = useState<string | null>(null);
   const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  // Public Landing Preview States
+  const [landingTab, setLandingTab] = useState<"projects" | "reports">("projects");
+  const [landingProjectFilter, setLandingProjectFilter] = useState<string>("ALL");
+
+  const uniqueLandingProjects = useMemo(() => {
+    const set = new Set<string>();
+    reports.forEach((r) => {
+      if (r.project_name?.trim()) set.add(r.project_name.trim());
+    });
+    return Array.from(set);
+  }, [reports]);
+
+  const filteredLandingReports = useMemo(() => {
+    if (landingProjectFilter === "ALL") return reports;
+    return reports.filter(
+      (r) => r.project_name?.trim().toLowerCase() === landingProjectFilter.toLowerCase()
+    );
+  }, [reports, landingProjectFilter]);
 
   // Initialize theme preference
   useEffect(() => {
@@ -214,7 +240,8 @@ export default function HomePage() {
           <span className="spinner" style={{ width: 44, height: 44, borderWidth: 3 }} />
         </div>
       ) : !user ? (
-        <div className="welcome-split-layout animate-fade-in">
+        <>
+          <div className="welcome-split-layout animate-fade-in">
           {/* Left Column: Company Logo & Corporate Information */}
           <div className="welcome-info-column">
             <div className="welcome-logo-container" title="Ethiopian Construction Works Corporation (ECWC / ኢ.ኮ.ሥ.ኮ)">
@@ -270,6 +297,31 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
+
+            {/* Quick Link to Preview Projects & Reports */}
+            {reports.length > 0 && (
+              <div style={{ marginTop: 22 }}>
+                <a
+                  href="#portal-preview"
+                  className="btn btn-secondary btn-sm"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                    borderRadius: 999,
+                    padding: "8px 18px",
+                    background: "rgba(116, 192, 36, 0.12)",
+                    borderColor: "rgba(116, 192, 36, 0.3)",
+                    color: "var(--ecwc-green)",
+                    fontWeight: 600,
+                    textDecoration: "none",
+                  }}
+                >
+                  <BarChartIcon size={14} />
+                  <span>Preview Active Projects &amp; Reports ({reports.length}) ↓</span>
+                </a>
+              </div>
+            )}
           </div>
 
           {/* Right Column: Sign In & Create Account Section */}
@@ -277,7 +329,127 @@ export default function HomePage() {
             <AuthModal onSuccess={(newUser) => setUser(newUser)} />
           </div>
         </div>
-      ) : user.role === "superadmin" ? (
+
+        {/* Public Portal Preview for Incoming Managers */}
+        <section id="portal-preview" className="landing-portal-preview-section">
+          <div className="landing-preview-header-bar">
+            <div className="landing-preview-title-group">
+              <div className="preview-badge">
+                <span className="badge-dot" />
+                <span>Public Project Oversight</span>
+              </div>
+              <h2 className="landing-preview-heading">
+                Active Projects &amp; Historical Reports Preview
+              </h2>
+              <p className="landing-preview-subheading">
+                Explore real-time project progress, status cards, and operational submissions logged across corporate construction projects before registering.
+              </p>
+            </div>
+
+            {/* View Switcher Pills */}
+            <div className="landing-preview-tabs" role="tablist">
+              <button
+                type="button"
+                id="tab-preview-projects"
+                className={`landing-preview-tab-btn ${landingTab === "projects" ? "active" : ""}`}
+                onClick={() => setLandingTab("projects")}
+                role="tab"
+                aria-selected={landingTab === "projects"}
+              >
+                <BarChartIcon size={16} />
+                <span>Status Project Cards</span>
+                <span className="tab-count-badge">{uniqueLandingProjects.length}</span>
+              </button>
+
+              <button
+                type="button"
+                id="tab-preview-reports"
+                className={`landing-preview-tab-btn ${landingTab === "reports" ? "active" : ""}`}
+                onClick={() => setLandingTab("reports")}
+                role="tab"
+                aria-selected={landingTab === "reports"}
+              >
+                <ClipboardListIcon size={16} />
+                <span>Previously Submitted Reports</span>
+                <span className="tab-count-badge">{reports.length}</span>
+              </button>
+            </div>
+          </div>
+
+          {loadingReports ? (
+            <div style={{ display: "flex", justifyContent: "center", padding: "60px 0" }}>
+              <span className="spinner" style={{ width: 40, height: 40, borderWidth: 3 }} />
+            </div>
+          ) : reports.length === 0 ? (
+            <div className="empty-state" style={{ padding: "48px 24px" }}>
+              <div className="empty-icon">
+                <InboxIcon size={48} />
+              </div>
+              <p style={{ fontWeight: 600, color: "var(--text-primary)" }}>No project reports submitted yet.</p>
+              <p style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>
+                Be the first project manager to register and publish a weekly progress report!
+              </p>
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                style={{ marginTop: 12 }}
+              >
+                <span>Sign Up as Project Manager ↑</span>
+              </button>
+            </div>
+          ) : landingTab === "projects" ? (
+            <div className="landing-tab-content animate-fade-in">
+              <ProjectAnalysisView reports={reports} user={null} />
+            </div>
+          ) : (
+            <div className="landing-tab-content animate-fade-in">
+              <div className="landing-reports-toolbar">
+                <div className="landing-reports-count">
+                  <span>Showing <strong>{filteredLandingReports.length}</strong> of <strong>{reports.length}</strong> submitted reports</span>
+                </div>
+
+                <div className="analytics-filter-wrapper">
+                  <label htmlFor="landing-project-filter" className="filter-label">
+                    <FilterIcon size={14} /> Filter Project:
+                  </label>
+                  <select
+                    id="landing-project-filter"
+                    value={landingProjectFilter}
+                    onChange={(e) => setLandingProjectFilter(e.target.value)}
+                    className="analytics-select"
+                  >
+                    <option value="ALL">All Corporate Projects ({reports.length})</option>
+                    {uniqueLandingProjects.map((p) => (
+                      <option key={p} value={p}>
+                        {p}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="reports-grid">
+                {filteredLandingReports.map((report) => (
+                  <ReportCard key={report.id} report={report} />
+                ))}
+              </div>
+
+              <div className="landing-reports-footer-cta">
+                <p>Are you managing a construction project for ECWC?</p>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                >
+                  <span>Register to Submit Reports ↑</span>
+                </button>
+              </div>
+            </div>
+          )}
+        </section>
+      </>
+    ) : user.role === "superadmin" ? (
         <SuperAdminDashboard
           user={user}
           reports={reports}
