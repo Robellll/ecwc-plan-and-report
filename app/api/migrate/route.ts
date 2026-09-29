@@ -29,12 +29,6 @@ export async function GET() {
 
     await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS project_name TEXT`;
     await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS phone_number TEXT`;
-    // Backfill any existing PMs that don't have project_name set yet
-    await sql`
-      UPDATE users
-      SET project_name = 'Gelan-Bishoftu Expressway Project'
-      WHERE role = 'project_manager' AND (project_name IS NULL OR project_name = '')
-    `;
 
     // 2. Project Reports base table
     await sql`

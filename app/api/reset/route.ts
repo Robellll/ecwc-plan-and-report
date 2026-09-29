@@ -29,18 +29,19 @@ export async function GET() {
       console.warn("Sequence reset warning (ignored):", seqErr);
     }
 
-    // 3. Remove all non-admin users (removes test PM and test DM accounts)
-    await sql`DELETE FROM users WHERE role != 'superadmin'`;
+    // 3. Remove all non-admin users (deletes all accounts except primary admin)
+    await sql`DELETE FROM users WHERE LOWER(email) != 'admin@ecwc.et'`;
 
     // 4. Ensure Super Admin account is intact with admin@ecwc.et / admin@1031
     const passwordHash = hashPassword("admin@1031");
     await sql`
-      INSERT INTO users (name, email, password_hash, role, department, project_name)
+      INSERT INTO users (name, email, password_hash, role, department, project_name, phone_number)
       VALUES (
         'System Administrator',
         'admin@ecwc.et',
         ${passwordHash},
         'superadmin',
+        NULL,
         NULL,
         NULL
       )
@@ -49,7 +50,8 @@ export async function GET() {
           password_hash = ${passwordHash},
           role = 'superadmin',
           department = NULL,
-          project_name = NULL
+          project_name = NULL,
+          phone_number = NULL
     `;
 
     return NextResponse.json({
