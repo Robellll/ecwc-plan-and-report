@@ -106,6 +106,7 @@ export default function SuperAdminDashboard({
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingUser, setEditingUser] = useState<UserRecord | null>(null);
   const [userToDelete, setUserToDelete] = useState<UserRecord | null>(null);
+  const [deleteDataOption, setDeleteDataOption] = useState<"keep" | "purge">("keep");
   const [resettingUser, setResettingUser] = useState<UserRecord | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
 
@@ -311,13 +312,19 @@ export default function SuperAdminDashboard({
       const res = await fetch("/api/users", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: userToDelete.id }),
+        body: JSON.stringify({
+          id: userToDelete.id,
+          delete_data: deleteDataOption === "purge",
+        }),
       });
       const data = await res.json();
       if (data.success) {
-        showToast("success", `User "${userToDelete.name}" deleted successfully.`);
+        showToast("success", data.message || `User "${userToDelete.name}" deleted successfully.`);
         setUserToDelete(null);
         fetchUsers();
+        if (deleteDataOption === "purge") {
+          onRefreshReports();
+        }
       } else {
         showToast("error", data.error || "Failed to delete user.");
       }
@@ -831,7 +838,10 @@ export default function SuperAdminDashboard({
                               <button
                                 type="button"
                                 className="user-action-btn delete"
-                                onClick={() => setUserToDelete(u)}
+                                onClick={() => {
+                                  setUserToDelete(u);
+                                  setDeleteDataOption("keep");
+                                }}
                                 title={`Delete ${u.name}`}
                               >
                                 <TrashIcon size={14} />
@@ -1231,12 +1241,15 @@ export default function SuperAdminDashboard({
       {/* ──────────────────────────────────────────
           MODAL 4: CONFIRM USER DELETION
           ────────────────────────────────────────── */}
+      {/* ──────────────────────────────────────────
+          MODAL 4: CONFIRM USER DELETION WITH RETENTION OPTIONS
+          ────────────────────────────────────────── */}
       {userToDelete && (
         <div className="admin-modal-overlay" onClick={() => !actionLoading && setUserToDelete(null)}>
           <div className="admin-modal-card" onClick={(e) => e.stopPropagation()}>
             <div className="admin-modal-header" style={{ borderBottomColor: "rgba(239, 68, 68, 0.3)" }}>
               <h3 className="admin-modal-title" style={{ color: "var(--danger)" }}>
-                <AlertTriangleIcon size={20} /> Confirm User Deletion
+                <AlertTriangleIcon size={20} /> Delete User Account: {userToDelete.name}
               </h3>
               <button
                 type="button"
@@ -1249,42 +1262,99 @@ export default function SuperAdminDashboard({
             </div>
 
             <div className="admin-modal-body">
-              <div className="admin-danger-box">
-                <div>
-                  <p style={{ fontWeight: 600, marginBottom: 4 }}>
-                    Are you sure you want to delete this user account?
-                  </p>
-                  <p>
-                    This will permanently revoke access credentials for <strong>{userToDelete.name}</strong> ({userToDelete.email}).
-                  </p>
-                </div>
-              </div>
-
+              {/* Target User Summary Card */}
               <div className="admin-user-preview-card">
                 <div className="user-avatar-sm" style={{ background: "rgba(239, 68, 68, 0.1)", color: "var(--danger)" }}>
                   <UserIcon size={14} />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 600 }}>{userToDelete.name}</div>
+                  <div style={{ fontWeight: 600, color: "var(--text-primary)" }}>{userToDelete.name}</div>
                   <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
-                    {userToDelete.email}
+                    {userToDelete.email} {userToDelete.phone_number ? `· 📞 ${userToDelete.phone_number}` : ""}
                   </div>
                   <div style={{ marginTop: 4, display: "flex", gap: 6, alignItems: "center" }}>
                     {getRoleBadge(userToDelete.role)}
                     <span style={{ fontSize: "0.78rem", color: "var(--text-secondary)" }}>
                       {userToDelete.role === "department_manager"
-                        ? userToDelete.department
+                        ? userToDelete.department || "Corporate Dept"
                         : userToDelete.role === "project_manager"
-                        ? userToDelete.project_name
+                        ? userToDelete.project_name || "General Project"
                         : "Super Admin"}
+                    </span>
+                    <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginLeft: "auto" }}>
+                      ({userToDelete.report_count || 0} reports · {userToDelete.task_count || 0} tasks)
                     </span>
                   </div>
                 </div>
               </div>
 
-              <p style={{ fontSize: "0.82rem", color: "var(--text-muted)", margin: 0 }}>
-                💡 <strong>Historical data preservation:</strong> Reports authored and tasks created by this user will remain in the system for historical accountability.
-              </p>
+              {/* Data Retention Checkbox Options */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 4 }}>
+                <label style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--text-primary)" }}>
+                  Select Deletion &amp; Data Retention Action:
+                </label>
+
+                {/* Option 1: Keep Data */}
+                <div
+                  className={`delete-option-card ${deleteDataOption === "keep" ? "selected-keep" : ""}`}
+                  onClick={() => setDeleteDataOption("keep")}
+                >
+                  <div className="delete-option-radio">
+                    <input
+                      type="checkbox"
+                      id="opt-keep"
+                      checked={deleteDataOption === "keep"}
+                      onChange={() => setDeleteDataOption("keep")}
+                    />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                      <label htmlFor="opt-keep" style={{ fontWeight: 600, color: "var(--text-primary)", fontSize: "0.9rem", cursor: "pointer" }}>
+                        Option 1: Keep the data
+                      </label>
+                      <span className="badge-recommended">Preserve Records</span>
+                    </div>
+                    <p style={{ margin: "4px 0 0", fontSize: "0.8rem", color: "var(--text-secondary)", lineHeight: 1.45 }}>
+                      Permanently revoke this user&apos;s login credentials. All their submitted weekly reports, progress numbers, and tasks <strong>remain safe in the database</strong> for corporate accountability and audits.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Option 2: Remove Account and Entire Data */}
+                <div
+                  className={`delete-option-card ${deleteDataOption === "purge" ? "selected-purge" : ""}`}
+                  onClick={() => setDeleteDataOption("purge")}
+                >
+                  <div className="delete-option-radio">
+                    <input
+                      type="checkbox"
+                      id="opt-purge"
+                      checked={deleteDataOption === "purge"}
+                      onChange={() => setDeleteDataOption("purge")}
+                    />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                      <label htmlFor="opt-purge" style={{ fontWeight: 600, color: "var(--danger)", fontSize: "0.9rem", cursor: "pointer" }}>
+                        Option 2: Remove account and entire data
+                      </label>
+                      <span className="badge-destructive">Complete Purge</span>
+                    </div>
+                    <p style={{ margin: "4px 0 0", fontSize: "0.8rem", color: "var(--text-muted)", lineHeight: 1.45 }}>
+                      Permanently delete this user account <strong>AND completely wipe</strong> all weekly reports, department updates, and tasks created by this user from the system.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {deleteDataOption === "purge" && (
+                <div className="admin-danger-box animate-fade-in" style={{ marginTop: 2 }}>
+                  <AlertTriangleIcon size={18} style={{ color: "var(--danger)", flexShrink: 0, marginTop: 2 }} />
+                  <p style={{ fontSize: "0.82rem", color: "var(--danger)", margin: 0 }}>
+                    <strong>Warning:</strong> Purging entire data will permanently delete all {userToDelete.report_count || 0} report(s) and {userToDelete.task_count || 0} task(s) associated with this account. This cannot be undone.
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="admin-modal-footer">
@@ -1294,7 +1364,7 @@ export default function SuperAdminDashboard({
                 onClick={() => setUserToDelete(null)}
                 disabled={actionLoading}
               >
-                Keep Account
+                Cancel
               </button>
               <button
                 type="button"
@@ -1302,16 +1372,26 @@ export default function SuperAdminDashboard({
                 onClick={handleConfirmDelete}
                 disabled={actionLoading}
                 style={{
-                  background: "var(--danger)",
+                  background: deleteDataOption === "purge" ? "#b91c1c" : "var(--danger)",
                   color: "#fff",
                   border: "none",
                   padding: "10px 18px",
                   borderRadius: "var(--radius-md)",
                   fontWeight: 600,
                   cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
                 }}
               >
-                {actionLoading ? "Deleting..." : "Permanently Delete User"}
+                <TrashIcon size={15} />
+                <span>
+                  {actionLoading
+                    ? "Deleting..."
+                    : deleteDataOption === "purge"
+                    ? "Purge Account & Entire Data"
+                    : "Delete Account (Keep Data)"}
+                </span>
               </button>
             </div>
           </div>

@@ -259,7 +259,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id } = body;
+    const { id, delete_data } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -277,9 +277,41 @@ export async function DELETE(request: NextRequest) {
     }
 
     const sql = getDb();
+
+    // Check target user to know their role and assigned project
+    const targetRows = (await sql`
+      SELECT id, name, role, project_name, department FROM users WHERE id = ${id} LIMIT 1
+    `) as any[];
+
+    if (!targetRows || targetRows.length === 0) {
+      return NextResponse.json(
+        { success: false, error: "User not found." },
+        { status: 404 }
+      );
+    }
+
+    const target = targetRows[0];
+
+    // If user selected to remove entire data associated with this user
+    if (delete_data === true) {
+      if (target.role === "project_manager" && target.project_name) {
+        await sql`DELETE FROM project_reports WHERE author_id = ${id} OR project_name = ${target.project_name}`;
+        await sql`DELETE FROM tasks WHERE created_by = ${id} OR project_name = ${target.project_name}`;
+      } else {
+        await sql`DELETE FROM project_reports WHERE author_id = ${id}`;
+        await sql`DELETE FROM tasks WHERE created_by = ${id}`;
+      }
+    }
+
+    // Delete user account
     await sql`DELETE FROM users WHERE id = ${id}`;
 
-    return NextResponse.json({ success: true, message: "User deleted successfully." });
+    return NextResponse.json({
+      success: true,
+      message: delete_data
+        ? `Account "${target.name}" and all associated reports/tasks were completely removed.`
+        : `Account "${target.name}" deleted. Historical reports and tasks are safely kept.`,
+    });
   } catch (error) {
     console.error("DELETE /api/users error:", error);
     return NextResponse.json(
