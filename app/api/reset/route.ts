@@ -9,7 +9,7 @@ import { hashPassword } from "@/lib/auth";
  * - Truncates all weekly project reports and resets sequence to 1
  * - Truncates all delegated tasks and resets sequence to 1
  * - Clears all test user accounts except the primary Super Admin (admin@ecwc.et)
- * - Ensures admin@ecwc.et / admin123 is ready for system administration
+ * - Ensures admin@ecwc.et / admin@1031 is ready for system administration
  */
 export async function GET() {
   try {
@@ -32,8 +32,8 @@ export async function GET() {
     // 3. Remove all non-admin users (removes test PM and test DM accounts)
     await sql`DELETE FROM users WHERE role != 'superadmin'`;
 
-    // 4. Ensure Super Admin account is intact with admin@ecwc.et / admin123
-    const passwordHash = hashPassword("admin123");
+    // 4. Ensure Super Admin account is intact with admin@ecwc.et / admin@1031
+    const passwordHash = hashPassword("admin@1031");
     await sql`
       INSERT INTO users (name, email, password_hash, role, department, project_name)
       VALUES (

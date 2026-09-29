@@ -5,7 +5,7 @@ import { hashPassword } from "@/lib/auth";
 /**
  * GET /api/seed
  * Seeds the database with 3 test accounts:
- *  1. SuperAdmin  (admin@ecwc.et / admin123)
+ *  1. SuperAdmin  (admin@ecwc.et / admin@1031)
  *  2. Project Manager (pm@ecwc.et / test123)
  *  3. Department Manager (dm@ecwc.et / test123)
  *
@@ -19,7 +19,7 @@ export async function GET() {
       {
         name: "System Administrator",
         email: "admin@ecwc.et",
-        password: "admin123",
+        password: "admin@1031",
         role: "superadmin",
         department: null,
         project_name: null,
@@ -78,7 +78,7 @@ export async function GET() {
       message: "Test accounts seeded successfully.",
       accounts: results,
       credentials: [
-        { role: "SuperAdmin", email: "admin@ecwc.et", password: "admin123" },
+        { role: "SuperAdmin", email: "admin@ecwc.et", password: "admin@1031" },
         { role: "Project Manager", email: "pm@ecwc.et", password: "test123" },
         { role: "Department Manager", email: "dm@ecwc.et", password: "test123" },
       ],
