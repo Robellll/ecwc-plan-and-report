@@ -187,7 +187,7 @@ export default function AuthModal({ onSuccess, defaultMode = "signin" }: AuthMod
           )}
 
           <div className="auth-field">
-            <label htmlFor="auth-email">Work Email</label>
+            <label htmlFor="auth-email">Email</label>
             <div className="auth-input-wrapper">
               <span className="auth-input-icon">
                 <MailIcon size={16} />
@@ -195,7 +195,7 @@ export default function AuthModal({ onSuccess, defaultMode = "signin" }: AuthMod
               <input
                 id="auth-email"
                 type="email"
-                placeholder="name@ecwc.et"
+                placeholder="xxxxx@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 autoComplete="email"
