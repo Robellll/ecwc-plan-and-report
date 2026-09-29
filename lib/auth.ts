@@ -79,6 +79,7 @@ export function verifySession(token: string): SessionUser | null {
       role: decoded.role,
       department: decoded.department || null,
       project_name: decoded.project_name || null,
+      phone_number: decoded.phone_number || null,
     };
   } catch {
     return null;
