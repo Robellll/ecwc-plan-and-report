@@ -58,7 +58,50 @@ export async function POST(request: NextRequest) {
   try {
     const user = getSessionUserFromRequest(request);
     const body = await request.json();
-    const { title, description, department, project_name, week_no, due_date, start_date, end_date } = body;
+    const sql = getDb();
+    const createdBy = user ? user.id : null;
+
+    // Check if batch tasks submitted
+    if (Array.isArray(body.tasks)) {
+      const createdTasks = [];
+      for (const t of body.tasks) {
+        if (!t.title?.trim() || !t.department?.trim()) continue;
+        const taskStatus = t.completed || t.status === "completed" ? "completed" : "pending";
+        const inserted = (await sql`
+          INSERT INTO tasks (
+            title,
+            description,
+            remarks,
+            department,
+            project_name,
+            week_no,
+            due_date,
+            start_date,
+            end_date,
+            created_by,
+            status
+          )
+          VALUES (
+            ${t.title.trim()},
+            ${t.description?.trim() || t.remarks?.trim() || ""},
+            ${t.remarks?.trim() || t.description?.trim() || ""},
+            ${t.department.trim()},
+            ${t.project_name?.trim() || body.project_name?.trim() || "General Project"},
+            ${Number(t.week_no || body.week_no) || 1},
+            ${t.due_date || null},
+            ${t.start_date || null},
+            ${t.end_date || null},
+            ${createdBy},
+            ${taskStatus}
+          )
+          RETURNING *
+        `) as any[];
+        if (inserted && inserted[0]) createdTasks.push(inserted[0]);
+      }
+      return NextResponse.json({ success: true, tasks: createdTasks }, { status: 201 });
+    }
+
+    const { title, description, remarks, department, project_name, week_no, due_date, start_date, end_date, status, completed } = body;
 
     if (!title?.trim()) {
       return NextResponse.json(
@@ -74,17 +117,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const sql = getDb();
-    const createdBy = user ? user.id : null;
     const resolvedDueDate = due_date || null;
     const resolvedStartDate = start_date || null;
     const resolvedEndDate = end_date || null;
+    const resolvedStatus = completed || status === "completed" ? "completed" : (status || "pending");
 
     const inserted = (await sql`
-      INSERT INTO tasks (title, description, department, project_name, week_no, due_date, start_date, end_date, created_by, status)
+      INSERT INTO tasks (
+        title,
+        description,
+        remarks,
+        department,
+        project_name,
+        week_no,
+        due_date,
+        start_date,
+        end_date,
+        created_by,
+        status
+      )
       VALUES (
         ${title.trim()},
-        ${description?.trim() || ""},
+        ${description?.trim() || remarks?.trim() || ""},
+        ${remarks?.trim() || description?.trim() || ""},
         ${department.trim()},
         ${project_name?.trim() || "General Project"},
         ${Number(week_no) || 1},
@@ -92,7 +147,7 @@ export async function POST(request: NextRequest) {
         ${resolvedStartDate},
         ${resolvedEndDate},
         ${createdBy},
-        'pending'
+        ${resolvedStatus}
       )
       RETURNING *
     `) as any[];

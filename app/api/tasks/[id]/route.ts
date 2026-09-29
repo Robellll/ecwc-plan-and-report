@@ -13,10 +13,15 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const { status } = body;
+    const { status, completed, remarks } = body;
+
+    let targetStatus = status;
+    if (completed !== undefined) {
+      targetStatus = completed ? "completed" : "pending";
+    }
 
     const validStatuses = ["pending", "in_progress", "completed"];
-    if (!status || !validStatuses.includes(status)) {
+    if (targetStatus && !validStatuses.includes(targetStatus)) {
       return NextResponse.json(
         { success: false, error: "Invalid status. Must be pending, in_progress, or completed." },
         { status: 400 }
@@ -24,12 +29,31 @@ export async function PATCH(
     }
 
     const sql = getDb();
-    const updated = (await sql`
-      UPDATE tasks
-      SET status = ${status}, updated_at = now()
-      WHERE id = ${taskId}
-      RETURNING *
-    `) as any[];
+    let updated: any[];
+    if (targetStatus && remarks !== undefined) {
+      updated = (await sql`
+        UPDATE tasks
+        SET status = ${targetStatus}, remarks = ${remarks}, updated_at = now()
+        WHERE id = ${taskId}
+        RETURNING *
+      `) as any[];
+    } else if (targetStatus) {
+      updated = (await sql`
+        UPDATE tasks
+        SET status = ${targetStatus}, updated_at = now()
+        WHERE id = ${taskId}
+        RETURNING *
+      `) as any[];
+    } else if (remarks !== undefined) {
+      updated = (await sql`
+        UPDATE tasks
+        SET remarks = ${remarks}, updated_at = now()
+        WHERE id = ${taskId}
+        RETURNING *
+      `) as any[];
+    } else {
+      return NextResponse.json({ success: false, error: "Nothing to update" }, { status: 400 });
+    }
 
     if (!updated || updated.length === 0) {
       return NextResponse.json({ success: false, error: "Task not found" }, { status: 404 });
